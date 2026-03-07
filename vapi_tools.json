@@ -12,11 +12,13 @@
             "description": "The caller's 10-digit US phone number (digits only, e.g. 5551234567)"
           }
         },
-        "required": ["phone_number"]
+        "required": [
+          "phone_number"
+        ]
       }
     },
     "server": {
-      "url": "https://YOUR_BACKEND_URL/vapi/lookup-patient"
+      "url": "https://patientregistration-w1e2.onrender.com/vapi/lookup-patient"
     }
   },
   {
@@ -27,31 +29,131 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "first_name":      { "type": "string", "description": "Patient's first name" },
-          "last_name":       { "type": "string", "description": "Patient's last name" },
-          "date_of_birth":   { "type": "string", "description": "Date of birth in MM/DD/YYYY format" },
-          "sex":             { "type": "string", "enum": ["Male","Female","Other","Decline to Answer"] },
-          "phone_number":    { "type": "string", "description": "10-digit US phone number" },
-          "email":           { "type": "string", "description": "Email address (optional)" },
-          "address_line_1":  { "type": "string", "description": "Street address" },
-          "address_line_2":  { "type": "string", "description": "Apt/Suite/Unit (optional)" },
-          "city":            { "type": "string" },
-          "state":           { "type": "string", "description": "2-letter US state abbreviation" },
-          "zip_code":        { "type": "string", "description": "5-digit or ZIP+4 format" },
-          "insurance_provider":   { "type": "string", "description": "Insurance company name (optional)" },
-          "insurance_member_id":  { "type": "string", "description": "Member/subscriber ID (optional)" },
-          "preferred_language":   { "type": "string", "description": "Preferred language, default English" },
-          "emergency_contact_name":  { "type": "string", "description": "Emergency contact full name (optional)" },
-          "emergency_contact_phone": { "type": "string", "description": "Emergency contact 10-digit phone (optional)" }
+          "first_name": {
+            "type": "string",
+            "description": "Patient's first name"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Patient's last name"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "description": "Date of birth in MM/DD/YYYY format"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "Male",
+              "Female",
+              "Other",
+              "Decline to Answer"
+            ]
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "10-digit US phone number"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address (optional)"
+          },
+          "address_line_1": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "address_line_2": {
+            "type": "string",
+            "description": "Apt/Suite/Unit (optional)"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "description": "2-letter US state abbreviation"
+          },
+          "zip_code": {
+            "type": "string",
+            "description": "5-digit or ZIP+4 format"
+          },
+          "insurance_provider": {
+            "type": "string",
+            "description": "Insurance company name (optional)"
+          },
+          "insurance_member_id": {
+            "type": "string",
+            "description": "Member/subscriber ID (optional)"
+          },
+          "preferred_language": {
+            "type": "string",
+            "description": "Preferred language, default English"
+          },
+          "emergency_contact_name": {
+            "type": "string",
+            "description": "Emergency contact full name (optional)"
+          },
+          "emergency_contact_phone": {
+            "type": "string",
+            "description": "Emergency contact 10-digit phone (optional)"
+          }
         },
         "required": [
-          "first_name","last_name","date_of_birth","sex","phone_number",
-          "address_line_1","city","state","zip_code"
+          "first_name",
+          "last_name",
+          "date_of_birth",
+          "sex",
+          "phone_number",
+          "address_line_1",
+          "city",
+          "state",
+          "zip_code"
         ]
       }
     },
     "server": {
-      "url": "https://YOUR_BACKEND_URL/vapi/save-patient"
+      "url": "https://patientregistration-w1e2.onrender.com/vapi/save-patient"
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "save_appointment",
+      "description": "Schedule an appointment for a patient after successful registration. Only call this after the patient has confirmed the appointment details.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "description": "The patient_id returned from save_patient"
+          },
+          "appointment_date": {
+            "type": "string",
+            "description": "Date in MM/DD/YYYY format"
+          },
+          "appointment_time": {
+            "type": "string",
+            "description": "Time e.g. '09:00 AM'"
+          },
+          "appointment_type": {
+            "type": "string",
+            "description": "Type of appointment e.g. 'General Checkup'"
+          },
+          "provider_name": {
+            "type": "string",
+            "description": "Doctor name e.g. 'Dr. Sarah Johnson'"
+          }
+        },
+        "required": [
+          "patient_id",
+          "appointment_date",
+          "appointment_time",
+          "appointment_type"
+        ]
+      }
+    },
+    "server": {
+      "url": "https://patientregistration-w1e2.onrender.com/vapi/save-appointment"
     }
   }
 ]

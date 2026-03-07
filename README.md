@@ -7,9 +7,9 @@ A voice-based AI agent accessible via a real US phone number that collects patie
 | Item | Value |
 |------|-------|
 | **Phone Number** | *(add your Vapi number here)* |
-| **API Base URL** | *(add your deployed URL here)* |
-| **Dashboard** | `GET /` |
-| **API Patients** | `GET /patients` |
+| **API Base URL** | https://patientregistration-w1e2.onrender.com |
+| **Dashboard** | https://patientregistration-w1e2.onrender.com/ |
+| **API Patients** | https://patientregistration-w1e2.onrender.com/patients |
 
 ---
 
