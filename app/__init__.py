@@ -1,6 +1,6 @@
 from flask import Flask
 from .database import db
-from .routes import patients_bp, vapi_bp
+from .routes import patients_bp, vapi_bp, appointments_bp
 import logging
 import os
 
@@ -24,6 +24,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(patients_bp)
     app.register_blueprint(vapi_bp)
+    app.register_blueprint(appointments_bp)
 
     with app.app_context():
         db.create_all()

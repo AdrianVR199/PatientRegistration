@@ -248,3 +248,173 @@ def vapi_lookup_patient():
     return jsonify({
         "results": [{"toolCallId": tool_call_id, "result": result}]
     }), 200
+
+
+# ─────────────────────────────────────────────
+# Blueprint: /appointments
+# ─────────────────────────────────────────────
+from .database import Appointment
+
+appointments_bp = Blueprint("appointments", __name__)
+
+VALID_APPOINTMENT_TYPES = [
+    "General Checkup",
+    "Follow-up Visit",
+    "Specialist Consultation",
+    "Vaccination",
+    "Lab Work",
+    "Physical Therapy",
+    "Mental Health",
+    "Dental",
+    "Vision",
+    "Other"
+]
+
+MOCK_PROVIDERS = [
+    "Dr. Sarah Johnson",
+    "Dr. Michael Chen",
+    "Dr. Emily Rodriguez",
+    "Dr. James Williams",
+    "Dr. Amanda Foster"
+]
+
+MOCK_AVAILABLE_SLOTS = [
+    {"date": "04/07/2026", "time": "09:00 AM"},
+    {"date": "04/07/2026", "time": "10:30 AM"},
+    {"date": "04/08/2026", "time": "02:00 PM"},
+    {"date": "04/09/2026", "time": "11:00 AM"},
+    {"date": "04/10/2026", "time": "03:30 PM"},
+    {"date": "04/11/2026", "time": "09:30 AM"},
+]
+
+
+@appointments_bp.route("/appointments", methods=["GET"])
+def list_appointments():
+    patient_id = request.args.get("patient_id")
+    q = Appointment.query
+    if patient_id:
+        q = q.filter_by(patient_id=patient_id)
+    appointments = q.order_by(Appointment.appointment_date).all()
+    return ok([a.to_dict() for a in appointments])
+
+
+@appointments_bp.route("/appointments/slots", methods=["GET"])
+def get_available_slots():
+    """Return mock available appointment slots."""
+    return ok({
+        "slots": MOCK_AVAILABLE_SLOTS,
+        "providers": MOCK_PROVIDERS,
+        "appointment_types": VALID_APPOINTMENT_TYPES
+    })
+
+
+@appointments_bp.route("/appointments/<appointment_id>", methods=["GET"])
+def get_appointment(appointment_id):
+    a = Appointment.query.filter_by(appointment_id=appointment_id).first()
+    if not a:
+        return err("Appointment not found.", 404)
+    return ok(a.to_dict())
+
+
+@appointments_bp.route("/appointments", methods=["POST"])
+def create_appointment():
+    data = request.get_json(silent=True)
+    if not data:
+        return err("Request body must be JSON.", 400)
+
+    required = ["patient_id", "appointment_date", "appointment_time", "appointment_type"]
+    missing = [f for f in required if not data.get(f)]
+    if missing:
+        return err(f"Missing required fields: {', '.join(missing)}", 422)
+
+    # Verify patient exists
+    patient = Patient.query.filter_by(patient_id=data["patient_id"]).filter(
+        Patient.deleted_at.is_(None)
+    ).first()
+    if not patient:
+        return err("Patient not found.", 404)
+
+    a = Appointment(
+        patient_id       = data["patient_id"],
+        appointment_date = data["appointment_date"],
+        appointment_time = data["appointment_time"],
+        appointment_type = data["appointment_type"],
+        provider_name    = data.get("provider_name", MOCK_PROVIDERS[0]),
+        notes            = data.get("notes"),
+        status           = "scheduled"
+    )
+    db.session.add(a)
+    db.session.commit()
+
+    logger.info("APPOINTMENT SCHEDULED: %s", a.to_dict())
+    return ok(a.to_dict(), 201)
+
+
+@appointments_bp.route("/appointments/<appointment_id>", methods=["PUT"])
+def update_appointment(appointment_id):
+    a = Appointment.query.filter_by(appointment_id=appointment_id).first()
+    if not a:
+        return err("Appointment not found.", 404)
+
+    data = request.get_json(silent=True) or {}
+    for field in ["appointment_date", "appointment_time", "appointment_type", "provider_name", "notes", "status"]:
+        if field in data:
+            setattr(a, field, data[field])
+
+    a.updated_at = datetime.now(timezone.utc)
+    db.session.commit()
+    return ok(a.to_dict())
+
+
+@appointments_bp.route("/appointments/<appointment_id>/cancel", methods=["POST"])
+def cancel_appointment(appointment_id):
+    a = Appointment.query.filter_by(appointment_id=appointment_id).first()
+    if not a:
+        return err("Appointment not found.", 404)
+    a.status = "cancelled"
+    a.updated_at = datetime.now(timezone.utc)
+    db.session.commit()
+    return ok({"message": "Appointment cancelled.", "appointment": a.to_dict()})
+
+
+# ── Vapi webhook for saving appointments ──────
+@vapi_bp.route("/vapi/save-appointment", methods=["POST"])
+def vapi_save_appointment():
+    """
+    Called by Vapi tool when the agent schedules an appointment after registration.
+    """
+    body = request.get_json(silent=True) or {}
+    logger.info("VAPI APPOINTMENT WEBHOOK: %s", body)
+
+    try:
+        tool_calls  = body["message"]["toolCallList"]
+        data        = tool_calls[0]["function"]["arguments"]
+        tool_call_id = tool_calls[0]["id"]
+    except (KeyError, IndexError, TypeError):
+        return jsonify({"error": "Invalid Vapi payload."}), 400
+
+    # Verify patient
+    patient = Patient.query.filter_by(patient_id=data.get("patient_id")).filter(
+        Patient.deleted_at.is_(None)
+    ).first()
+    if not patient:
+        return jsonify({"results": [{"toolCallId": tool_call_id, "result": "ERROR: Patient not found."}]}), 200
+
+    a = Appointment(
+        patient_id       = data["patient_id"],
+        appointment_date = data.get("appointment_date", MOCK_AVAILABLE_SLOTS[0]["date"]),
+        appointment_time = data.get("appointment_time", MOCK_AVAILABLE_SLOTS[0]["time"]),
+        appointment_type = data.get("appointment_type", "General Checkup"),
+        provider_name    = data.get("provider_name", MOCK_PROVIDERS[0]),
+        notes            = data.get("notes"),
+        status           = "scheduled"
+    )
+    db.session.add(a)
+    db.session.commit()
+
+    logger.info("APPOINTMENT SAVED VIA VAPI: %s", a.to_dict())
+
+    return jsonify({"results": [{
+        "toolCallId": tool_call_id,
+        "result": f"SUCCESS:{a.appointment_id}:{a.appointment_date}:{a.appointment_time}:{a.provider_name}"
+    }]}), 200

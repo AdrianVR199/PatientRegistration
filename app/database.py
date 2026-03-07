@@ -59,3 +59,34 @@ class Patient(db.Model):
             "created_at":   self.created_at.isoformat() if self.created_at else None,
             "updated_at":   self.updated_at.isoformat() if self.updated_at else None,
         }
+
+
+class Appointment(db.Model):
+    __tablename__ = "appointments"
+
+    appointment_id   = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    patient_id       = db.Column(db.String(36), db.ForeignKey("patients.patient_id"), nullable=False)
+    appointment_date = db.Column(db.String(10),  nullable=False)   # MM/DD/YYYY
+    appointment_time = db.Column(db.String(8),   nullable=False)   # HH:MM AM/PM
+    appointment_type = db.Column(db.String(100), nullable=False)   # e.g. "General Checkup"
+    provider_name    = db.Column(db.String(100), nullable=True)    # e.g. "Dr. Smith"
+    notes            = db.Column(db.String(500), nullable=True)
+    status           = db.Column(db.String(20),  nullable=False, default="scheduled")  # scheduled/cancelled/completed
+    created_at       = db.Column(db.DateTime(timezone=True), default=now_utc)
+    updated_at       = db.Column(db.DateTime(timezone=True), default=now_utc, onupdate=now_utc)
+
+    patient = db.relationship("Patient", backref="appointments")
+
+    def to_dict(self):
+        return {
+            "appointment_id":   self.appointment_id,
+            "patient_id":       self.patient_id,
+            "appointment_date": self.appointment_date,
+            "appointment_time": self.appointment_time,
+            "appointment_type": self.appointment_type,
+            "provider_name":    self.provider_name,
+            "notes":            self.notes,
+            "status":           self.status,
+            "created_at":       self.created_at.isoformat() if self.created_at else None,
+            "updated_at":       self.updated_at.isoformat() if self.updated_at else None,
+        }
