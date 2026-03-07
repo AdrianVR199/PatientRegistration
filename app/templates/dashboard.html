@@ -3,221 +3,140 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Medical Center — Patient Registry Dashboard</title>
+  <title>Sunrise Medical — Patient Registry</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --accent: #0ea5e9;
-      --accent-dark: #0284c7;
-    }
+    :root { --accent: #0ea5e9; --accent-dark: #0284c7; }
     body { font-family: 'DM Sans', sans-serif; background: #f0f4f8; }
     h1, h2, .serif { font-family: 'DM Serif Display', serif; }
 
-    .card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      transition: box-shadow 0.2s;
-    }
-    .card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+    .card { background:white; border-radius:1rem; box-shadow:0 2px 12px rgba(0,0,0,0.06); transition:box-shadow 0.2s; }
+    .card:hover { box-shadow:0 4px 24px rgba(0,0,0,0.10); }
 
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 9999px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-    }
-    .badge-male   { background:#dbeafe; color:#1d4ed8; }
-    .badge-female { background:#fce7f3; color:#be185d; }
-    .badge-other  { background:#f3e8ff; color:#7e22ce; }
-    .badge-decline{ background:#f1f5f9; color:#64748b; }
+    .badge { display:inline-block; padding:2px 10px; border-radius:9999px; font-size:0.72rem; font-weight:600; letter-spacing:0.03em; }
+    .badge-male    { background:#dbeafe; color:#1d4ed8; }
+    .badge-female  { background:#fce7f3; color:#be185d; }
+    .badge-other   { background:#f3e8ff; color:#7e22ce; }
+    .badge-decline { background:#f1f5f9; color:#64748b; }
 
-    .stat-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      border-left: 4px solid var(--accent);
-    }
+    .stat-card { background:white; border-radius:1rem; padding:1.25rem 1.5rem; box-shadow:0 2px 12px rgba(0,0,0,0.06); border-left:4px solid var(--accent); }
 
     input, select {
-      border: 1.5px solid #e2e8f0;
-      border-radius: 0.5rem;
-      padding: 0.5rem 0.85rem;
-      font-size: 0.875rem;
-      outline: none;
-      transition: border-color 0.15s;
-      background: white;
-      font-family: 'DM Sans', sans-serif;
+      border:1.5px solid #e2e8f0; border-radius:0.5rem;
+      padding:0.5rem 0.85rem; font-size:0.875rem; outline:none;
+      transition:border-color 0.15s; background:white;
+      font-family:'DM Sans',sans-serif; width:100%; box-sizing:border-box;
     }
-    input:focus, select:focus { border-color: var(--accent); }
+    input:focus, select:focus { border-color:var(--accent); }
 
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1.25rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s;
-      border: none;
-    }
-    .btn-primary:hover { background: var(--accent-dark); }
+    .btn-primary { background:var(--accent); color:white; border-radius:0.5rem; padding:0.5rem 1.25rem; font-size:0.875rem; font-weight:600; cursor:pointer; transition:background 0.15s; border:none; white-space:nowrap; }
+    .btn-primary:hover { background:var(--accent-dark); }
+    .btn-secondary { background:#f1f5f9; color:#64748b; border-radius:0.5rem; padding:0.5rem 1rem; font-size:0.875rem; font-weight:600; border:none; cursor:pointer; white-space:nowrap; }
 
-    .btn-danger {
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 0.5rem;
-      padding: 0.35rem 0.85rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: background 0.15s;
-    }
-    .btn-danger:hover { background: #fecaca; }
+    .btn-danger { background:#fee2e2; color:#dc2626; border-radius:0.5rem; padding:0.35rem 0.85rem; font-size:0.8rem; font-weight:600; cursor:pointer; border:none; transition:background 0.15s; }
+    .btn-danger:hover { background:#fecaca; }
+    .btn-view { background:#f0f9ff; color:#0ea5e9; border-radius:0.4rem; padding:0.3rem 0.75rem; font-size:0.78rem; font-weight:600; border:none; cursor:pointer; }
 
-    table { border-collapse: collapse; width: 100%; }
-    th {
-      background: #f8fafc;
-      text-align: left;
-      padding: 0.75rem 1rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: #64748b;
-      border-bottom: 1.5px solid #e2e8f0;
-    }
-    td {
-      padding: 0.85rem 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 0.875rem;
-      color: #334155;
-      vertical-align: middle;
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f8fafc; }
+    table { border-collapse:collapse; width:100%; }
+    th { background:#f8fafc; text-align:left; padding:0.75rem 1rem; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:#64748b; border-bottom:1.5px solid #e2e8f0; white-space:nowrap; }
+    td { padding:0.85rem 1rem; border-bottom:1px solid #f1f5f9; font-size:0.875rem; color:#334155; vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:#f8fafc; }
 
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(15,23,42,0.45);
-      backdrop-filter: blur(2px);
-      z-index: 50;
-      display: flex; align-items: center; justify-content: center;
-      padding: 1rem;
-    }
-    .modal {
-      background: white;
-      border-radius: 1.25rem;
-      padding: 2rem;
-      max-width: 640px;
-      width: 100%;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-    }
+    /* Mobile card view for patients */
+    .patient-card { background:white; border-radius:0.75rem; padding:1rem; box-shadow:0 1px 6px rgba(0,0,0,0.06); border:1px solid #f1f5f9; }
 
-    .fade-in { animation: fadeIn 0.35s ease; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    .modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,0.45); backdrop-filter:blur(2px); z-index:50; display:flex; align-items:center; justify-content:center; padding:1rem; }
+    .modal { background:white; border-radius:1.25rem; padding:1.5rem; max-width:640px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.18); }
 
-    .spinner {
-      border: 3px solid #e2e8f0;
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      width: 2rem; height: 2rem;
-      animation: spin 0.7s linear infinite;
-      margin: 2rem auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .fade-in { animation:fadeIn 0.35s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
 
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #94a3b8;
-    }
-    .toast {
-      position: fixed; bottom: 1.5rem; right: 1.5rem;
-      background: #0f172a; color: white;
-      padding: 0.85rem 1.5rem;
-      border-radius: 0.75rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      z-index: 100;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      animation: slideUp 0.3s ease;
-    }
-    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+    .spinner { border:3px solid #e2e8f0; border-top-color:var(--accent); border-radius:50%; width:2rem; height:2rem; animation:spin 0.7s linear infinite; margin:2rem auto; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    .empty-state { text-align:center; padding:3rem 1rem; color:#94a3b8; }
+
+    .toast { position:fixed; bottom:1.5rem; right:1rem; left:1rem; background:#0f172a; color:white; padding:0.85rem 1.5rem; border-radius:0.75rem; font-size:0.875rem; font-weight:500; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.2); animation:slideUp 0.3s ease; text-align:center; }
+    @media(min-width:640px) { .toast { left:auto; width:auto; max-width:360px; } }
+    @keyframes slideUp { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:none;} }
   </style>
 </head>
 <body class="min-h-screen">
 
   <!-- Header -->
   <header style="background:white; border-bottom:1.5px solid #e2e8f0;">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div style="background:#0ea5e9; border-radius:0.6rem; padding:0.45rem 0.65rem;">
+        <div style="background:#0ea5e9; border-radius:0.6rem; padding:0.45rem 0.65rem; flex-shrink:0;">
           <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
             <circle cx="12" cy="9" r="2.5"/>
           </svg>
         </div>
         <div>
-          <h1 class="serif text-xl text-slate-800 leading-tight">Medical Center</h1>
-          <p class="text-xs text-slate-400 font-medium tracking-wide">Patient Registry Dashboard</p>
+          <h1 class="serif text-lg sm:text-xl text-slate-800 leading-tight">Sunrise Medical</h1>
+          <p class="text-xs text-slate-400 font-medium tracking-wide">Patient Registry</p>
         </div>
       </div>
-      <div style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:0.5rem;padding:0.4rem 1rem;font-size:0.8rem;color:#0369a1;font-weight:500;">📞 Patients register via voice agent</div>
+      <!-- Hidden on very small screens -->
+      <div class="hidden sm:block" style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:0.5rem;padding:0.4rem 1rem;font-size:0.8rem;color:#0369a1;font-weight:500;white-space:nowrap;">
+        📞 Patients register via voice agent
+      </div>
+      <!-- Short version for mobile -->
+      <div class="block sm:hidden" style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:0.5rem;padding:0.35rem 0.6rem;font-size:0.75rem;color:#0369a1;font-weight:500;">
+        📞 Voice only
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-6 py-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
-    <!-- Stats -->
-    <div class="grid grid-cols-2 gap-4 mb-8" id="statsRow" style="grid-template-columns: repeat(4,1fr);">
+    <!-- Stats: 2 cols on mobile, 4 on desktop -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
       <div class="stat-card">
-        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Total Patients</p>
-        <p class="text-3xl font-light text-slate-800 serif" id="statTotal">—</p>
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Total</p>
+        <p class="text-2xl sm:text-3xl font-light text-slate-800 serif" id="statTotal">—</p>
       </div>
       <div class="stat-card" style="border-color:#f472b6;">
         <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Female</p>
-        <p class="text-3xl font-light text-slate-800 serif" id="statFemale">—</p>
+        <p class="text-2xl sm:text-3xl font-light text-slate-800 serif" id="statFemale">—</p>
       </div>
       <div class="stat-card" style="border-color:#60a5fa;">
         <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Male</p>
-        <p class="text-3xl font-light text-slate-800 serif" id="statMale">—</p>
+        <p class="text-2xl sm:text-3xl font-light text-slate-800 serif" id="statMale">—</p>
       </div>
       <div class="stat-card" style="border-color:#34d399;">
-        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">With Insurance</p>
-        <p class="text-3xl font-light text-slate-800 serif" id="statInsured">—</p>
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Insured</p>
+        <p class="text-2xl sm:text-3xl font-light text-slate-800 serif" id="statInsured">—</p>
       </div>
     </div>
 
     <!-- Search & Filter -->
-    <div class="card p-5 mb-6">
-      <div class="flex flex-wrap gap-3 items-end">
+    <div class="card p-4 sm:p-5 mb-6">
+      <!-- Mobile: stacked. Desktop: row -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">Last Name</label>
-          <input id="filterLastName" type="text" placeholder="e.g. Smith" style="width:160px;" oninput="debounceSearch()"/>
+          <input id="filterLastName" type="text" placeholder="e.g. Smith" oninput="debounceSearch()"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">Date of Birth</label>
-          <input id="filterDOB" type="text" placeholder="MM/DD/YYYY" style="width:140px;" oninput="debounceSearch()"/>
+          <input id="filterDOB" type="text" placeholder="MM/DD/YYYY" oninput="debounceSearch()"/>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">Phone</label>
-          <input id="filterPhone" type="text" placeholder="e.g. 5551234567" style="width:150px;" oninput="debounceSearch()"/>
+          <input id="filterPhone" type="text" placeholder="e.g. 5551234567" oninput="debounceSearch()"/>
         </div>
+      </div>
+      <div class="flex gap-2">
         <button class="btn-primary" onclick="loadPatients()">Search</button>
-        <button onclick="clearFilters()" style="background:#f1f5f9;color:#64748b;border-radius:0.5rem;padding:0.5rem 1rem;font-size:0.875rem;font-weight:600;border:none;cursor:pointer;">Clear</button>
+        <button class="btn-secondary" onclick="clearFilters()">Clear</button>
       </div>
     </div>
 
-    <!-- Table -->
+    <!-- Table (desktop) / Cards (mobile) -->
     <div class="card overflow-hidden">
       <div id="tableContainer">
         <div class="spinner"></div>
@@ -229,58 +148,71 @@
   <div class="modal-overlay" id="detailModal" style="display:none;" onclick="closeModal(event)">
     <div class="modal fade-in" onclick="event.stopPropagation()">
       <div class="flex justify-between items-start mb-5">
-        <h2 class="serif text-2xl text-slate-800" id="modalTitle">Patient Details</h2>
-        <button onclick="closeDetailModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;line-height:1;">×</button>
+        <h2 class="serif text-xl sm:text-2xl text-slate-800" id="modalTitle">Patient Details</h2>
+        <button onclick="closeDetailModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;line-height:1;padding:0 0.25rem;">×</button>
       </div>
       <div id="modalContent"></div>
     </div>
   </div>
 
-
 <script>
   let searchTimer = null;
-  let allPatients = [];
 
   async function loadPatients() {
     const params = new URLSearchParams();
-    const ln = document.getElementById('filterLastName').value.trim();
+    const ln  = document.getElementById('filterLastName').value.trim();
     const dob = document.getElementById('filterDOB').value.trim();
-    const ph = document.getElementById('filterPhone').value.trim();
-    if (ln) params.append('last_name', ln);
+    const ph  = document.getElementById('filterPhone').value.trim();
+    if (ln)  params.append('last_name', ln);
     if (dob) params.append('date_of_birth', dob);
-    if (ph) params.append('phone_number', ph);
+    if (ph)  params.append('phone_number', ph);
 
     document.getElementById('tableContainer').innerHTML = '<div class="spinner"></div>';
     try {
-      const res = await fetch('/patients?' + params.toString());
+      const res  = await fetch('/patients?' + params.toString());
       const json = await res.json();
-      allPatients = json.data || [];
-      renderTable(allPatients);
-      updateStats(allPatients);
+      const patients = json.data || [];
+      updateStats(patients);
+      // Responsive: cards on mobile, table on desktop
+      if (window.innerWidth < 768) {
+        renderCards(patients);
+      } else {
+        renderTable(patients);
+      }
     } catch(e) {
       document.getElementById('tableContainer').innerHTML =
         '<div class="empty-state"><p class="text-lg font-semibold">Could not connect to API</p><p class="text-sm mt-1">Make sure the server is running.</p></div>';
     }
   }
 
+  // Re-render on resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(loadPatients, 300);
+  });
+
   function updateStats(patients) {
-    document.getElementById('statTotal').textContent = patients.length;
-    document.getElementById('statFemale').textContent = patients.filter(p=>p.sex==='Female').length;
-    document.getElementById('statMale').textContent = patients.filter(p=>p.sex==='Male').length;
-    document.getElementById('statInsured').textContent = patients.filter(p=>p.insurance_provider).length;
+    document.getElementById('statTotal').textContent   = patients.length;
+    document.getElementById('statFemale').textContent  = patients.filter(p => p.sex === 'Female').length;
+    document.getElementById('statMale').textContent    = patients.filter(p => p.sex === 'Male').length;
+    document.getElementById('statInsured').textContent = patients.filter(p => p.insurance_provider).length;
   }
 
   function sexBadge(sex) {
     const map = { Male:'badge-male', Female:'badge-female', Other:'badge-other', 'Decline to Answer':'badge-decline' };
-    return `<span class="badge ${map[sex]||'badge-decline'}">${sex||'—'}</span>`;
+    return `<span class="badge ${map[sex] || 'badge-decline'}">${sex || '—'}</span>`;
   }
 
+  function formatPhone(p) {
+    if (!p) return '—';
+    const d = p.replace(/\D/g, '');
+    return d.length === 10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : p;
+  }
+
+  // ── Desktop: full table ──────────────────────────────
   function renderTable(patients) {
-    if (!patients.length) {
-      document.getElementById('tableContainer').innerHTML =
-        '<div class="empty-state"><p class="text-lg font-semibold">No patients found</p><p class="text-sm mt-1">Try adjusting your filters or add a new patient.</p></div>';
-      return;
-    }
+    if (!patients.length) { renderEmpty(); return; }
     const rows = patients.map(p => `
       <tr>
         <td>
@@ -291,11 +223,13 @@
         <td>${sexBadge(p.sex)}</td>
         <td>${formatPhone(p.phone_number)}</td>
         <td>${p.city}, ${p.state}</td>
-        <td>${p.insurance_provider ? `<span style="color:#0ea5e9;font-weight:500;">${p.insurance_provider}</span>` : '<span class="text-slate-300">—</span>'}</td>
+        <td>${p.insurance_provider
+          ? `<span style="color:#0ea5e9;font-weight:500;">${p.insurance_provider}</span>`
+          : '<span class="text-slate-300">—</span>'}</td>
         <td>
           <div class="flex gap-2">
-            <button onclick="viewPatient('${p.patient_id}')" style="background:#f0f9ff;color:#0ea5e9;border-radius:0.4rem;padding:0.3rem 0.75rem;font-size:0.78rem;font-weight:600;border:none;cursor:pointer;">View</button>
-            <button class="btn-danger" onclick="deletePatient('${p.patient_id}', '${p.first_name} ${p.last_name}')">Delete</button>
+            <button class="btn-view" onclick="viewPatient('${p.patient_id}')">View</button>
+            <button class="btn-danger" onclick="deletePatient('${p.patient_id}','${p.first_name} ${p.last_name}')">Delete</button>
           </div>
         </td>
       </tr>`).join('');
@@ -305,36 +239,64 @@
         <table>
           <thead>
             <tr>
-              <th>Patient</th><th>Date of Birth</th><th>Sex</th>
+              <th>Patient</th><th>DOB</th><th>Sex</th>
               <th>Phone</th><th>Location</th><th>Insurance</th><th>Actions</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
-      <div style="padding:0.85rem 1rem;border-top:1px solid #f1f5f9;font-size:0.8rem;color:#94a3b8;">
-        Showing ${patients.length} patient${patients.length!==1?'s':''}
+      <div style="padding:0.75rem 1rem;border-top:1px solid #f1f5f9;font-size:0.8rem;color:#94a3b8;">
+        ${patients.length} patient${patients.length !== 1 ? 's' : ''}
       </div>`;
   }
 
-  function formatPhone(p) {
-    if (!p) return '—';
-    const d = p.replace(/\D/g,'');
-    return d.length===10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : p;
+  // ── Mobile: card list ────────────────────────────────
+  function renderCards(patients) {
+    if (!patients.length) { renderEmpty(); return; }
+    const cards = patients.map(p => `
+      <div class="patient-card">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="font-semibold text-slate-800">${p.first_name} ${p.last_name}</p>
+            <p class="text-xs text-slate-400">${p.date_of_birth} · ${sexBadge(p.sex)}</p>
+          </div>
+          <div class="flex gap-2 ml-2">
+            <button class="btn-view" onclick="viewPatient('${p.patient_id}')">View</button>
+            <button class="btn-danger" onclick="deletePatient('${p.patient_id}','${p.first_name} ${p.last_name}')">Del</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-1 text-xs text-slate-500 mt-2">
+          <span>📞 ${formatPhone(p.phone_number)}</span>
+          <span>📍 ${p.city}, ${p.state}</span>
+          ${p.insurance_provider ? `<span class="col-span-2" style="color:#0ea5e9;">🏥 ${p.insurance_provider}</span>` : ''}
+        </div>
+      </div>`).join('');
+
+    document.getElementById('tableContainer').innerHTML = `
+      <div class="flex flex-col gap-3 p-4">${cards}</div>
+      <div style="padding:0.75rem 1rem;border-top:1px solid #f1f5f9;font-size:0.8rem;color:#94a3b8;">
+        ${patients.length} patient${patients.length !== 1 ? 's' : ''}
+      </div>`;
+  }
+
+  function renderEmpty() {
+    document.getElementById('tableContainer').innerHTML =
+      '<div class="empty-state"><p class="text-lg font-semibold">No patients found</p><p class="text-sm mt-1">Try adjusting your filters.</p></div>';
   }
 
   async function viewPatient(id) {
-    const res = await fetch(`/patients/${id}`);
+    const res  = await fetch(`/patients/${id}`);
     const json = await res.json();
-    const p = json.data;
-    document.getElementById('modalTitle').textContent = `${p.first_name} ${p.last_name}`;
+    const p    = json.data;
 
     const field = (label, val) => val
       ? `<div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-0.5">${label}</p><p class="text-sm text-slate-700">${val}</p></div>`
       : '';
 
+    document.getElementById('modalTitle').textContent = `${p.first_name} ${p.last_name}`;
     document.getElementById('modalContent').innerHTML = `
-      <div class="grid gap-4 mb-4" style="grid-template-columns:1fr 1fr;">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         ${field('Patient ID', p.patient_id)}
         ${field('Date of Birth', p.date_of_birth)}
         ${field('Sex', p.sex)}
@@ -343,19 +305,19 @@
         ${field('Preferred Language', p.preferred_language)}
       </div>
       <hr style="border-color:#f1f5f9;margin-bottom:1rem;"/>
-      <div class="grid gap-4 mb-4" style="grid-template-columns:1fr 1fr;">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         ${field('Address', p.address_line_1 + (p.address_line_2 ? ', ' + p.address_line_2 : ''))}
         ${field('City / State / ZIP', `${p.city}, ${p.state} ${p.zip_code}`)}
       </div>
       ${p.insurance_provider ? `
         <hr style="border-color:#f1f5f9;margin-bottom:1rem;"/>
-        <div class="grid gap-4 mb-4" style="grid-template-columns:1fr 1fr;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           ${field('Insurance Provider', p.insurance_provider)}
           ${field('Member ID', p.insurance_member_id)}
         </div>` : ''}
       ${p.emergency_contact_name ? `
         <hr style="border-color:#f1f5f9;margin-bottom:1rem;"/>
-        <div class="grid gap-4" style="grid-template-columns:1fr 1fr;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           ${field('Emergency Contact', p.emergency_contact_name)}
           ${field('Emergency Phone', formatPhone(p.emergency_contact_phone))}
         </div>` : ''}
@@ -366,7 +328,7 @@
   }
 
   async function deletePatient(id, name) {
-    if (!confirm(`Delete patient "${name}"? This action can be undone.`)) return;
+    if (!confirm(`Delete "${name}"? This can be undone by an admin.`)) return;
     const res = await fetch(`/patients/${id}`, { method: 'DELETE' });
     if (res.ok) {
       showToast(`${name} removed from registry.`);
@@ -374,6 +336,8 @@
     }
   }
 
+  function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
+  function closeModal(e) { if (e.target === document.getElementById('detailModal')) closeDetailModal(); }
 
   function debounceSearch() {
     clearTimeout(searchTimer);
