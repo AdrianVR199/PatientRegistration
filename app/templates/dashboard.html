@@ -158,6 +158,32 @@
 <script>
   let searchTimer = null;
 
+  async function loadAppointments(patientId) {
+    const section = document.getElementById('appointmentsSection-' + patientId);
+    if (!section) return;
+    try {
+      const res  = await fetch('/appointments?patient_id=' + patientId);
+      const json = await res.json();
+      const appts = json.data || [];
+      if (!appts.length) {
+        section.innerHTML = '<hr style="border-color:#f1f5f9;margin:1rem 0;"/><p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Appointments</p><p class="text-sm text-slate-400">No appointments scheduled.</p>';
+        return;
+      }
+      const statusColor = { scheduled:'#0ea5e9', completed:'#10b981', cancelled:'#ef4444' };
+      const rows = appts.map(a => `
+        <div style="padding:0.6rem 0;border-bottom:1px solid #f1f5f9;">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm font-semibold text-slate-700">${a.appointment_type}</p>
+              <p class="text-xs text-slate-400">${a.appointment_date} at ${a.appointment_time} · ${a.provider_name || '—'}</p>
+            </div>
+            <span style="font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:9999px;background:${statusColor[a.status]}20;color:${statusColor[a.status]};">${a.status}</span>
+          </div>
+        </div>`).join('');
+      section.innerHTML = '<hr style="border-color:#f1f5f9;margin:1rem 0;"/><p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">📅 Appointments</p>' + rows;
+    } catch(e) { console.error('Could not load appointments', e); }
+  }
+
   async function loadPatients() {
     const params = new URLSearchParams();
     const ln  = document.getElementById('filterLastName').value.trim();
@@ -322,9 +348,13 @@
           ${field('Emergency Phone', formatPhone(p.emergency_contact_phone))}
         </div>` : ''}
       <hr style="border-color:#f1f5f9;margin:1rem 0;"/>
-      <p class="text-xs text-slate-400">Registered: ${new Date(p.created_at).toLocaleString()}</p>`;
+      <p class="text-xs text-slate-400">Registered: ${new Date(p.created_at).toLocaleString()}</p>
+      <div id="appointmentsSection-${p.patient_id}" class="mt-4"></div>`;
 
     document.getElementById('detailModal').style.display = 'flex';
+
+    // Load appointments after modal is visible
+    setTimeout(() => loadAppointments(p.patient_id), 100);
   }
 
   async function deletePatient(id, name) {
